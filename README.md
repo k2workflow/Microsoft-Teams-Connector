@@ -1,6 +1,6 @@
 ## K2 Microsoft Teams Connector
 
-This connector for K2 Nexus integrates with Microsoft Teams. It allows you to create, update, and delete Teams, Channels in Teams, and Tabs in Channels. It also allows you to send a message to a channel.
+This connector for K2 Cloud integrates with Microsoft Teams. It allows you to create, update, and delete Teams, Channels in Teams, and Tabs in Channels. It also allows you to send a message to a channel.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -33,7 +33,6 @@ Before you see SmartObjects and run methods on them, you must do the following:
 
  Next, configure permissions by clicking **API permissions**. Permissions allow K2 to act on behalf of users. There are **Application** and **Delegated** permissions available in Azure. It's safest to grant both types to the app where specified. Click the **Add a permission** button and find the following permissions to add (search usually works best):
 
- * Azure Permissions
   + K2 API (search for this one and assign Delegated permissions)
   + Directory.Read.All
   + email
@@ -59,7 +58,7 @@ Before you see SmartObjects and run methods on them, you must do the following:
   1. Browse to K2 Management and expand the **Authentication** node
   2. Expand the **OAuth** node
   3. Click **Resources** and then click **New**
-  4. Give your resource a name and then paste  the authorization endpoint into the **Authorization Endpoint** field, and the token endpoint into the **Token Endpoint** and *Refresh Token Endpoint** fields.
+  4. Give your resource a name and then paste  the authorization endpoint into the **Authorization Endpoint** field, and the token endpoint into the **Token Endpoint** and **Refresh Token Endpoint** fields.
   5. Add the following parameters to your resource:
   * Resource parameters
    + grant_type: **Token Value** = authorization_code, **Refresh Value** = refresh_token
@@ -67,7 +66,7 @@ Before you see SmartObjects and run methods on them, you must do the following:
    + redirect_uri: for **Authorization Value** and **Token Value** put in the URL https://{KUID}.onk2.com/Identity/token/oauth/2
    + scope: for **Authorization Value** and **Token Value** put TeamsApp.ReadWrite.All
    + response_type: for **Authorization Value** put code
-   + client_secret: for **Token Value** and *Refresh Value** put your client secret
+   + client_secret: for **Token Value** and **Refresh Value** put your client secret
   6. Save the resource and confirm that it's similar to the following figure
 
   ![Example OAuth Resource for Microsoft Teams](/OAuthResource.png)
