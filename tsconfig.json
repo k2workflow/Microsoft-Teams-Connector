@@ -1,0 +1,3 @@
+{
+    "extends": "@k2oss/k2-broker-core/shared/tsconfig.json"
+}

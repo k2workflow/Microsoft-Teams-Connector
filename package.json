@@ -1,0 +1,66 @@
+{
+  "name": "MicrosoftTeamsConnector",
+  "version": "1.0.0",
+  "description": "JSSP-based Microsoft Teams Connector",
+  "homepage": "https://www.k2.com",
+  "license": "MIT",
+  "private": true,
+  "author": {
+    "name": "K2 OSS",
+    "email": "oss@k2.com",
+    "url": "https://www.k2.com"
+  },
+  "files": [
+    "dist/index.js"
+  ],
+  "keywords": [
+    "k2-extension",
+    "k2-broker"
+  ],
+  "scripts": {
+    "build": "npm run build:bundle-prod",
+    "build:dev": "npm run build:bundle-dev",
+    "build:bundle-dev": "node node_modules/rollup/dist/bin/rollup -c --environment NODE_ENV:development",
+    "build:bundle-prod": "node node_modules/rollup/dist/bin/rollup -c --environment NODE_ENV:production",
+    "watch": "node node_modules/rollup/dist/bin/rollup -c --watch --environment NODE_ENV:development",
+    "run-tests": "nyc ava",
+    "test": "npm run build && npm run run-tests",
+    "test:dev": "npm run build:dev && npm run run-tests"
+  },
+  "ava": {
+    "typescript": {
+      "rewritePaths": {
+        "src/": "dist/"
+      }
+    }
+  },
+  "nyc": {
+    "reporter": [
+      "text",
+      "html",
+      "cobertura"
+    ],
+    "exclude": [
+      "src/test.ts"
+    ]
+  },
+  "devDependencies": {
+    "@ava/typescript": "1.0.0",
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3",
+    "@babel/register": "^7.8.3",
+    "@babel/runtime": "^7.8.3",
+    "@k2oss/k2-broker-core": "1.0.0",
+    "@rollup/plugin-commonjs": "11.0.1",
+    "@rollup/plugin-json": "4.0.1",
+    "@rollup/plugin-node-resolve": "7.0.0",
+    "@rollup/plugin-replace": "2.3.0",
+    "ava": "^3.1.0",
+    "core-js": "^3.6.4",
+    "nyc": "^15.0.0",
+    "rollup": "^2.7.6",
+    "rollup-plugin-babel": "4.3.3",
+    "rollup-plugin-terser": "5.2.0"
+  }
+}
