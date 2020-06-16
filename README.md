@@ -1,6 +1,8 @@
-# K2 Microsoft Teams Connector
+## K2 Microsoft Teams Connector
 
 This connector for K2 Nexus integrates with Microsoft Teams. It allows you to create, update, and delete Teams, Channels in Teams, and Tabs in Channels. It also allows you to send a message to a channel.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Features
 
