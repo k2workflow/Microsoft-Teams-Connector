@@ -31,7 +31,7 @@ Before you see SmartObjects and run methods on them, you must do the following:
 
  Also, you need to create a secret. Click Certificates & secrets and then click **New client secret**. Once you create the secret, make a note of it as you'll also need to add this to your OAuth Resource.
 
- Next, configure permissions by clicking **API permissions**. Permissions allow K2 to act on behalf of users. There are **Application** and **Delegated** permissions available in Azure. It's safest to grant both types to the app where specified. Click the **Add a permission** button and find the following permissions to add (search usually works best):
+ Next, configure permissions by clicking **API permissions**. Permissions allow K2 to act on behalf of users. There are **Application** and **Delegated** permissions available in Azure. It's safest to grant both types to the app where specified. Click the **Add a permission** button and find the following Microsoft Graph permissions to add (search usually works best once you click Microsoft Graph):
 
   + K2 API (search for this one and assign Delegated permissions)
   + Directory.Read.All
@@ -40,7 +40,7 @@ Before you see SmartObjects and run methods on them, you must do the following:
   + Group.ReadWrite.All
   + openid
   + profile
-  + TeamsActivity.ReadWrite.All
+  + TeamsActivity.Read.All
   + TeamsActivity.Send
   + TeamsApp.ReadWrite.All
   + TeamSettings.ReadWrite.All
@@ -58,7 +58,7 @@ Before you see SmartObjects and run methods on them, you must do the following:
   1. Browse to K2 Management and expand the **Authentication** node
   2. Expand the **OAuth** node
   3. Click **Resources** and then click **New**
-  4. Give your resource a name and then paste  the authorization endpoint into the **Authorization Endpoint** field, and the token endpoint into the **Token Endpoint** and **Refresh Token Endpoint** fields.
+  4. Give your resource a name, select **Microsoft Online** as the Resource Type, and then paste the authorization endpoint into the **Authorization Endpoint** field, and the token endpoint into the **Token Endpoint** and **Refresh Token Endpoint** fields.
   5. Add the following parameters to your resource:
   * Resource parameters
    + grant_type: **Token Value** = authorization_code, **Refresh Value** = refresh_token
