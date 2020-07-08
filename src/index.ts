@@ -87,6 +87,7 @@ const ChannelIsSuccessful = "isSuccessful";
 const ChannelTeamId = "teamId";
 const ChannelMessageSubject = "messageSubject";
 const ChannelMessageBody = "messageBody";
+const ChannelMessageId = "messageId";
 const ChannelMessageIsImportant = "messageIsImportant";
 
 const ChannelGet = "get";
@@ -95,6 +96,7 @@ const ChannelCreate = "create";
 const ChannelDelete = "delete";
 const ChannelUpdate = "update";
 const ChannelSendMessage = "sendMessage";
+const ChannelReplyMessage = "replyMessage";
 
 //
 // Tab
@@ -145,7 +147,7 @@ const AppTeamsAppId = "teamsAppId";
 const AppList = "list";
 
 //OnDescribe
-ondescribe = function() {
+ondescribe = function () {
     postSchema({
 
         objects: {
@@ -385,28 +387,28 @@ ondescribe = function() {
                             TeamIsSuccessful
                         ]
                     },
-/*                     [TeamCheckStatus]: {
-                        displayName: "Check Status",
-                        description: "Check the status of an Archive job.",
-                        type: "execute",
-                        parameters: {
-                            [TeamArchiveOperationUrl]: {
-                                displayName: "Archive/Unarchive operation URL",
-                                type: "string"
-                            }
-                        },
-                        requiredParameters: [TeamArchiveOperationUrl],
-                        outputs: [TeamOperationId,
-                            TeamOperationType,
-                            TeamCreationDate,
-                            TeamArchiveStatus,
-                            TeamLastActionDate,
-                            TeamAttemptsCount,
-                            TeamTargetResourceId,
-                            TeamTargetResourceLocation,
-                            TeamArchiveError
-                        ]
-                    }, */
+                    /*                     [TeamCheckStatus]: {
+                                            displayName: "Check Status",
+                                            description: "Check the status of an Archive job.",
+                                            type: "execute",
+                                            parameters: {
+                                                [TeamArchiveOperationUrl]: {
+                                                    displayName: "Archive/Unarchive operation URL",
+                                                    type: "string"
+                                                }
+                                            },
+                                            requiredParameters: [TeamArchiveOperationUrl],
+                                            outputs: [TeamOperationId,
+                                                TeamOperationType,
+                                                TeamCreationDate,
+                                                TeamArchiveStatus,
+                                                TeamLastActionDate,
+                                                TeamAttemptsCount,
+                                                TeamTargetResourceId,
+                                                TeamTargetResourceLocation,
+                                                TeamArchiveError
+                                            ]
+                                        }, */
                     [TeamAddMember]: {
                         displayName: "Add Member",
                         description: "Adds a member to a Team",
@@ -571,6 +573,11 @@ ondescribe = function() {
                         description: "Message Subject",
                         type: "string"
                     },
+                    [ChannelMessageId]: {
+                        displayName: "Message Id",
+                        description: "Message Id",
+                        type: "string"
+                    },
                     [ChannelMessageBody]: {
                         displayName: "Body",
                         description: "Message Body",
@@ -659,7 +666,7 @@ ondescribe = function() {
                     },
                     [ChannelSendMessage]: {
                         displayName: "Send Message",
-                        description: "Sens a message to a Channel",
+                        description: "Sends a Message to a Channel",
                         type: "create",
                         inputs: [ChannelTeamId,
                             ChannelId,
@@ -669,6 +676,22 @@ ondescribe = function() {
                         ],
                         requiredInputs: [ChannelTeamId,
                             ChannelId,
+                            ChannelMessageBody
+                        ],
+                        outputs: [ChannelIsSuccessful, ChannelMessageId]
+                    },
+                    [ChannelReplyMessage]: {
+                        displayName: "Reply to a Message",
+                        description: "Reply to a Message in a Channel",
+                        type: "create",
+                        inputs: [ChannelTeamId,
+                            ChannelId,
+                            ChannelMessageId,
+                            ChannelMessageBody
+                        ],
+                        requiredInputs: [ChannelTeamId,
+                            ChannelId,
+                            ChannelMessageId,
                             ChannelMessageBody
                         ],
                         outputs: [ChannelIsSuccessful]
@@ -1236,7 +1259,7 @@ ondescribe = function() {
 }
 
 // OnExecute
-onexecute = function ({objectName, methodName, parameters, properties}) {
+onexecute = function ({ objectName, methodName, parameters, properties }) {
     switch (objectName) {
         case Team:
             onexecuteTeam(methodName, parameters, properties);
@@ -1267,7 +1290,7 @@ function onexecuteTeam(methodName: string, parameters: SingleRecord, properties:
     if (properties == null && parameters == null) {
         //do nothing
     }
-    else if (properties == null && parameters !== null){
+    else if (properties == null && parameters !== null) {
         parameters[TeamIsSuccessful] = true;
     }
     else {
@@ -1321,7 +1344,7 @@ function onexecuteTab(methodName: string, parameters: SingleRecord, properties: 
     if (properties == null && parameters == null) {
         //do nothing
     }
-    else if (properties == null && parameters !== null){
+    else if (properties == null && parameters !== null) {
         parameters[TabIsSuccessful] = true;
     }
     else {
@@ -1430,7 +1453,7 @@ function onexecuteTeamCreate(parameters: SingleRecord, properties: SingleRecord)
             //         //Add Members to the Group
             //         AddGroupMembers(parameters, properties, function (d) {
             //             //Post Results
-                         CreateAndReturnTeamObject(parameters, properties);
+            CreateAndReturnTeamObject(parameters, properties);
             //         });
             //     });
             // });
@@ -1449,7 +1472,7 @@ function GetGroupIdByMailNickName(parameters: SingleRecord, properties: SingleRe
 
 function GetGroupDetailsById(parameters: SingleRecord, properties: SingleRecord, cb) {
     let teamId = properties[TeamId];
-    if(!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
+    if (!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
 
     var url = baseUriEndpoint + "/groups/" + encodeURIComponent(teamId);
     ExecuteRequest(url, null, "GET", function (responseText) {
@@ -1460,7 +1483,7 @@ function GetGroupDetailsById(parameters: SingleRecord, properties: SingleRecord,
 
 function GetTeamDetailsByID(parameters: SingleRecord, properties: SingleRecord, cb) {
     let teamId = properties[TeamId];
-    if(!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
+    if (!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(teamId);
     ExecuteRequest(url, null, "GET", function (responseText) {
@@ -1477,7 +1500,7 @@ function CreateGroup(parameters: SingleRecord, properties: SingleRecord, cb) {
         "groupTypes": ["Unified"],
         "mailEnabled": properties[TeamMailEnabled],
         "mailNickname": properties[TeamMailNickname],
-        "visibility":"Private",
+        "visibility": "Private",
         "securityEnabled": false
     });
     var url = baseUriEndpoint + "/groups/";
@@ -1515,7 +1538,7 @@ function ArchiveTeam(parameters: SingleRecord, properties: SingleRecord, cb) {
     });
 
     let teamId = properties[TeamId];
-    if(!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
+    if (!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(teamId) + "/archive";
     ExecuteRequest(url, data, "POST", function (responseText) {
@@ -1528,8 +1551,8 @@ function UnarchiveTeam(parameters: SingleRecord, properties: SingleRecord, cb) {
     var data = null;
 
     let teamId = properties[TeamId];
-    if(!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
-    
+    if (!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
+
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(teamId) + "/unarchive";
     ExecuteRequest(url, data, "POST", function (responseText) {
         if (typeof cb === 'function')
@@ -1581,7 +1604,7 @@ function CloneTeam(parameters: SingleRecord, properties: SingleRecord, cb) {
     });
 
     let teamId = properties[TeamId];
-    if(!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
+    if (!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(teamId) + "/clone";
     ExecuteRequest(url, data, "POST", function (responseText) {
@@ -1592,7 +1615,7 @@ function CloneTeam(parameters: SingleRecord, properties: SingleRecord, cb) {
 
 function GetUser(parameters: SingleRecord, properties: SingleRecord, cb) {
     let teamUserPrincipalName = properties[TeamUserPrincipalName];
-    if(!(typeof teamUserPrincipalName === "string")) throw new Error("properties[TeamUserPrincipalName] is not of type string");
+    if (!(typeof teamUserPrincipalName === "string")) throw new Error("properties[TeamUserPrincipalName] is not of type string");
 
     var url = baseUriEndpoint + "/users/" + encodeURIComponent(teamUserPrincipalName);
     ExecuteRequest(url, null, "GET", function (responseText) {
@@ -1607,9 +1630,9 @@ function AddGroupOwner(parameters: SingleRecord, properties: SingleRecord, cb) {
     });
 
     let teamId = properties[TeamId];
-    if(!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
+    if (!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
 
-    var url = baseUriEndpoint + "/groups/" + encodeURIComponent(teamId)+ "/owners/$ref";
+    var url = baseUriEndpoint + "/groups/" + encodeURIComponent(teamId) + "/owners/$ref";
     ExecuteRequest(url, data, "POST", function (responseText) {
         if (typeof cb === 'function')
             cb(responseText);
@@ -1622,7 +1645,7 @@ function AddGroupMembers(parameters: SingleRecord, properties: SingleRecord, cb)
     });
 
     let teamId = properties[TeamId];
-    if(!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
+    if (!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
 
     var url = baseUriEndpoint + "/groups/" + encodeURIComponent(teamId) + "/members/$ref";
     ExecuteRequest(url, data, "POST", function (responseText) {
@@ -1636,12 +1659,12 @@ function RemoveGroupMembers(parameters: SingleRecord, properties: SingleRecord, 
     // var data = JSON.stringify({
     //     "@odata.id": baseUriEndpoint + "/directoryObjects/" + parameters[TeamUserId]
     // });
-    
+
     let teamId = properties[TeamId];
-    if(!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
+    if (!(typeof teamId === "string")) throw new Error("properties[TeamId] is not of type string");
 
     let teamUserId = properties[TeamUserId];
-    if(!(typeof teamUserId === "string")) throw new Error("properties[TeamUserId] is not of type string");
+    if (!(typeof teamUserId === "string")) throw new Error("properties[TeamUserId] is not of type string");
 
     var url = baseUriEndpoint + "/groups/" + encodeURIComponent(teamId) + "/members/" + encodeURIComponent(teamUserId) + "/$ref";
     ExecuteRequest(url, null, "DELETE", function (responseText) {
@@ -1683,8 +1706,8 @@ function ExecuteRequest(url: string, data: string, requestType: string, cb) {
         }
         else if (xhr.status == 404) {
             var obj = JSON.parse(xhr.responseText);
-             // This is to supress an error that happens with team archive/unarchive
-            var errorMessage = obj.error.message;            
+            // This is to supress an error that happens with team archive/unarchive
+            var errorMessage = obj.error.message;
             if (errorMessage.startswith == "No Team found with Group id") {
                 // do nothing - supress error
             }
@@ -1795,7 +1818,7 @@ function GetTeams(parameters: SingleRecord, properties: SingleRecord, cb) {
     }
     else {
         let teamDisplayNameStartsWith = parameters[TeamDisplayNameStartsWith];
-        if(!(typeof teamDisplayNameStartsWith === "string")) throw new Error("parameters[TeamDisplayNameStartsWith] is not of type string");
+        if (!(typeof teamDisplayNameStartsWith === "string")) throw new Error("parameters[TeamDisplayNameStartsWith] is not of type string");
 
         let component = "?$filter=startswith(displayName, '" + encodeURIComponent(teamDisplayNameStartsWith) + "')&$select=id,displayName,resourceProvisioningOptions";
         var url = baseUriEndpoint + "/groups" + component;
@@ -1840,7 +1863,7 @@ function CheckArchivalStatus(parameters: SingleRecord, properties: SingleRecord,
     var data = null;
 
     let teamArchiveOperationUrl = parameters[TeamArchiveOperationUrl];
-    if(!(typeof teamArchiveOperationUrl === "string")) throw new Error("parameters[TeamArchiveOperationUrl] is not of type string");
+    if (!(typeof teamArchiveOperationUrl === "string")) throw new Error("parameters[TeamArchiveOperationUrl] is not of type string");
 
     var url = baseUriEndpoint + "/" + encodeURIComponent(teamArchiveOperationUrl);
     ExecuteRequest(url, data, "GET", function (responseText) {
@@ -1880,7 +1903,7 @@ function onexecuteChannel(methodName: string, parameters: SingleRecord, properti
     if (properties == null && parameters == null) {
         //do nothing
     }
-    else if (properties == null && parameters !== null){
+    else if (properties == null && parameters !== null) {
         parameters[ChannelIsSuccessful] = true;
     }
     else {
@@ -1904,6 +1927,9 @@ function onexecuteChannel(methodName: string, parameters: SingleRecord, properti
             break;
         case ChannelSendMessage:
             onexecuteSendMessage(parameters, properties);
+            break;
+        case ChannelReplyMessage:
+            onexecuteReplyMessage(parameters, properties);
             break;
         default: throw new Error("The channel method " + methodName + " is not supported...");
     }
@@ -1970,12 +1996,12 @@ function onexecuteChannelGet(parameters: SingleRecord, properties: SingleRecord)
     properties[ChannelIsSuccessful] = true;
     GetChannel(parameters, properties, function (a) {
         properties[ChannelId] = a.id,
-        properties[ChannelDisplayName] = a.displayName,
-        properties[ChannelDescription] = a.description,
-        properties[ChannelEmail] = a.email,
-        properties[ChannelWeburl] = a.webUrl
+            properties[ChannelDisplayName] = a.displayName,
+            properties[ChannelDescription] = a.description,
+            properties[ChannelEmail] = a.email,
+            properties[ChannelWeburl] = a.webUrl
         //Post Results
-            CreateAndReturnChannelObject(parameters, properties);
+        CreateAndReturnChannelObject(parameters, properties);
     });
 }
 
@@ -1999,7 +2025,7 @@ function onexecuteChannelCreate(parameters: SingleRecord, properties: SingleReco
         properties[ChannelDescription] = a.description;
         properties[ChannelEmail] = a.email;
         properties[ChannelWeburl] = a.webUrl;
-            CreateAndReturnChannelObject(parameters, properties);
+        CreateAndReturnChannelObject(parameters, properties);
     });
 }
 
@@ -2027,10 +2053,10 @@ function onexecuteChannelDelete(parameters: SingleRecord, properties: SingleReco
 
 function DeleteChannel(parameters: SingleRecord, properties: SingleRecord, cb) {
     let channelTeamId = properties[ChannelTeamId];
-    if(!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
+    if (!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
 
     let channelId = properties[ChannelId];
-    if(!(typeof channelId === "string")) throw new Error("properties[ChannelId] is not of type string");
+    if (!(typeof channelId === "string")) throw new Error("properties[ChannelId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(channelTeamId) + "/channels/" + encodeURIComponent(channelId);
     ExecuteRequest(url, null, "DELETE", function (responseText) {
@@ -2046,7 +2072,7 @@ function CreateChannel(parameters: SingleRecord, properties: SingleRecord, cb) {
     });
 
     let channelTeamId = properties[ChannelTeamId];
-    if(!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
+    if (!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(channelTeamId) + "/channels";
     ExecuteRequest(url, data, "POST", function (responseText) {
@@ -2071,10 +2097,10 @@ function CreateAndReturnChannelObject(parameters: SingleRecord, properties: Sing
 
 function GetChannel(parameters: SingleRecord, properties: SingleRecord, cb) {
     let channelTeamId = properties[ChannelTeamId];
-    if(!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
+    if (!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
 
     let channelId = properties[ChannelId];
-    if(!(typeof channelId === "string")) throw new Error("properties[ChannelId] is not of type string");
+    if (!(typeof channelId === "string")) throw new Error("properties[ChannelId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(channelTeamId) + "/channels/" + encodeURIComponent(channelId);
     ExecuteRequest(url, null, "GET", function (responseText) {
@@ -2085,7 +2111,7 @@ function GetChannel(parameters: SingleRecord, properties: SingleRecord, cb) {
 
 function GetChannelList(parameters: SingleRecord, properties: SingleRecord, cb) {
     let channelTeamId = properties[ChannelTeamId];
-    if(!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
+    if (!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(channelTeamId) + "/channels?$select=id, displayname, description, email";
     ExecuteRequest(url, null, "GET", function (responseText) {
@@ -2102,10 +2128,10 @@ function UpdateChannel(parameters: SingleRecord, properties: SingleRecord, cb) {
     });
 
     let channelTeamId = properties[ChannelTeamId];
-    if(!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
+    if (!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
 
     let channelId = properties[ChannelId];
-    if(!(typeof channelId === "string")) throw new Error("properties[ChannelId] is not of type string");
+    if (!(typeof channelId === "string")) throw new Error("properties[ChannelId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(channelTeamId) + "/channels/" + encodeURIComponent(channelId);
     ExecuteRequest(url, data, "PATCH", function (responseText) {
@@ -2117,7 +2143,8 @@ function UpdateChannel(parameters: SingleRecord, properties: SingleRecord, cb) {
 function onexecuteSendMessage(parameters: SingleRecord, properties: SingleRecord) {
     SendMessage(parameters, properties, function (a) {
         postResult({
-            [ChannelIsSuccessful]: true
+            [ChannelIsSuccessful]: true,
+            [ChannelMessageId]: a.id
         });
     });
 }
@@ -2134,10 +2161,10 @@ function SendMessage(parameters: SingleRecord, properties: SingleRecord, cb) {
     });
 
     let channelTeamId = properties[ChannelTeamId];
-    if(!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
+    if (!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
 
     let channelId = properties[ChannelId];
-    if(!(typeof channelId === "string")) throw new Error("properties[ChannelId] is not of type string");
+    if (!(typeof channelId === "string")) throw new Error("properties[ChannelId] is not of type string");
 
     var url = baseUriEndpointBeta + "/teams/" + encodeURIComponent(channelTeamId) + "/channels/" + encodeURIComponent(channelId) + "/messages";
     ExecuteRequest(url, data, "POST", function (responseText) {
@@ -2146,6 +2173,37 @@ function SendMessage(parameters: SingleRecord, properties: SingleRecord, cb) {
     });
 }
 
+function onexecuteReplyMessage(parameters: SingleRecord, properties: SingleRecord) {
+    ReplyMessage(parameters, properties, function (a) {
+        postResult({
+            [ChannelIsSuccessful]: true
+        });
+    });
+}
+
+function ReplyMessage(parameters: SingleRecord, properties: SingleRecord, cb) {
+    var data = JSON.stringify({
+        "body": {
+            "contentType": "html",
+            "content": properties[ChannelMessageBody]
+        }
+    });
+
+    let channelTeamId = properties[ChannelTeamId];
+    if (!(typeof channelTeamId === "string")) throw new Error("properties[ChannelTeamId] is not of type string");
+
+    let channelId = properties[ChannelId];
+    if (!(typeof channelId === "string")) throw new Error("properties[ChannelId] is not of type string");
+
+    let channelMessageId = properties[ChannelMessageId];
+    if (!(typeof channelMessageId === "string")) throw new Error("properties[ChannelMessageId] is not of type string");
+
+    var url = baseUriEndpointBeta + "/teams/" + encodeURIComponent(channelTeamId) + "/channels/" + encodeURIComponent(channelId) + "/messages/" + + encodeURIComponent(channelMessageId) + "/replies";
+    ExecuteRequest(url, data, "POST", function (responseText) {
+        if (typeof cb === 'function')
+            cb(responseText);
+    });
+}
 
 function onexecuteTabGet(parameters: SingleRecord, properties: SingleRecord) {
     GetTabInformation(parameters, properties, function (a) {
@@ -2168,13 +2226,13 @@ function onexecuteTabGet(parameters: SingleRecord, properties: SingleRecord) {
 
 function GetTabInformation(parameters: SingleRecord, properties: SingleRecord, cb) {
     let tabTeamId = properties[TabTeamId];
-    if(!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
+    if (!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
 
     let tabChannelId = properties[TabChannelId];
-    if(!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
+    if (!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
 
     let tabId = properties[TabId];
-    if(!(typeof tabId === "string")) throw new Error("properties[TabId] is not of type string");
+    if (!(typeof tabId === "string")) throw new Error("properties[TabId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(tabTeamId) + "/Channels/" + encodeURIComponent(tabChannelId) + "/tabs/" + encodeURIComponent(tabId) + "?$expand=teamsApp";
     ExecuteRequest(url, null, "GET", function (responseText) {
@@ -2197,13 +2255,13 @@ function UpdateTab(parameters: SingleRecord, properties: SingleRecord, cb) {
     });
 
     let tabTeamId = properties[TabTeamId];
-    if(!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
+    if (!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
 
     let tabChannelId = properties[TabChannelId];
-    if(!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
+    if (!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
 
     let tabId = properties[TabId];
-    if(!(typeof tabId === "string")) throw new Error("properties[TabId] is not of type string");
+    if (!(typeof tabId === "string")) throw new Error("properties[TabId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(tabTeamId) + "/Channels/" + encodeURIComponent(tabChannelId) + "/tabs/" + encodeURIComponent(tabId);
     ExecuteRequest(url, data, "PATCH", function (responseText) {
@@ -2291,10 +2349,10 @@ function prepareDataAndCreateTab(parameters: SingleRecord, properties: SingleRec
 
 function CreateTab(parameters: SingleRecord, properties: SingleRecord, data: string, cb) {
     let tabTeamId = properties[TabTeamId];
-    if(!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
+    if (!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
 
     let tabChannelId = properties[TabChannelId];
-    if(!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
+    if (!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(tabTeamId) + "/channels/" + encodeURIComponent(tabChannelId) + "/tabs";
     ExecuteRequest(url, data, "POST", function (responseText) {
@@ -2407,13 +2465,13 @@ function onexecuteTabDelete(parameters: SingleRecord, properties: SingleRecord) 
 
 function DeleteTab(parameters: SingleRecord, properties: SingleRecord, cb) {
     let tabTeamId = properties[TabTeamId];
-    if(!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
+    if (!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
 
     let tabChannelId = properties[TabChannelId];
-    if(!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
+    if (!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
 
     let tabId = properties[TabId];
-    if(!(typeof tabId === "string")) throw new Error("properties[TabId] is not of type string");
+    if (!(typeof tabId === "string")) throw new Error("properties[TabId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(tabTeamId) + "/Channels/" + encodeURIComponent(tabChannelId) + "/tabs/" + encodeURIComponent(tabId);
     ExecuteRequest(url, null, "DELETE", function (responseText) {
@@ -2425,8 +2483,8 @@ function DeleteTab(parameters: SingleRecord, properties: SingleRecord, cb) {
 
 function GetInstalledAppList(parameters: SingleRecord, properties: SingleRecord, cb) {
     let appTeamId = properties[AppTeamId];
-    if(!(typeof appTeamId === "string")) throw new Error("properties[AppTeamId] is not of type string");
-    
+    if (!(typeof appTeamId === "string")) throw new Error("properties[AppTeamId] is not of type string");
+
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(appTeamId) + "/installedApps?$expand=teamsAppDefinition";
     ExecuteRequest(url, null, "GET", function (responseText) {
         if (typeof cb === 'function')
@@ -2451,10 +2509,10 @@ function onexecuteInstalledAppList(parameters: SingleRecord, properties: SingleR
 
 function GetTabList(parameters: SingleRecord, properties: SingleRecord, cb) {
     let tabTeamId = properties[TabTeamId];
-    if(!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
+    if (!(typeof tabTeamId === "string")) throw new Error("properties[TabTeamId] is not of type string");
 
     let tabChannelId = properties[TabChannelId];
-    if(!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
+    if (!(typeof tabChannelId === "string")) throw new Error("properties[TabChannelId] is not of type string");
 
     var url = baseUriEndpoint + "/teams/" + encodeURIComponent(tabTeamId) + "/channels/" + encodeURIComponent(tabChannelId) + "/tabs?$select=id,displayName,webUrl";
     ExecuteRequest(url, null, "GET", function (responseText) {
