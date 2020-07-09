@@ -29,7 +29,7 @@ Before you see SmartObjects and run methods on them, you must do the following:
  
  Create a new app in Azure by browsing to **Azure Active Directory > App registrations**. Give it a name like **K2 for Microsoft Teams**. Once you have the app created, make a note of its Application ID. This is the app's client ID that you'll use when you create the OAuth resource in K2.
 
- Configure the Redirect URI for your app to match your K2 token endpoing, such as https://{KUID}.onk2.com/Identity/token/oauth/2. You can find your KUID by browsing to your vanity URL and adding **/autodiscover/autodiscover** onto the end of the URL. You can find your KUID in the resulting page.
+ Configure the Redirect URI for your app to match your K2 token endpoint, such as https://{KUID}.onk2.com/Identity/token/oauth/2. (You can find your KUID by browsing to your onK2 URL and adding **/autodiscover/autodiscover** onto the end of the URL. You can find your KUID in the resulting page.)
 
  Also, you need to create a secret. Click Certificates & secrets and then click **New client secret**. Once you create the secret, make a note of it as you'll also need to add this to your OAuth Resource.
 
